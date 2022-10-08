@@ -16,13 +16,21 @@ function App() {
 
   const updateEvent = () => {
     const newEvent = {date: dayjs().format()};
-    const updated = [...events, newEvent];
+    const updated = [newEvent, ...events];
     localStorage.setItem(EVENTS, JSON.stringify(updated));
     setEvents(updated);
   }
 
   const deleteEvents = () => {
-    if (window.confirm('Are you sure you want to delete all events?')) {
+    if (!window.confirm('Are you sure you want to delete all events?')) {
+      return;
+    }
+
+    if (events.length > 5) {
+      const updated = events.slice(0, 5);
+      localStorage.setItem(EVENTS, JSON.stringify(updated));
+      setEvents(updated);
+    } else {
       localStorage.removeItem(EVENTS);
       setEvents([]);
     }
