@@ -1,24 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useState} from 'react';
 import './App.css';
 
+const EVENTS = 'events';
+
+type Event = {
+  date: string;
+};
+
 function App() {
+  const [events, setEvents] = useState(JSON.parse(localStorage.getItem(EVENTS) || '[]'))
+
+  const updateEvent = () => {
+    const newEvent = {date: new Date().getTime()};
+    const updated = [...events, newEvent];
+    localStorage.setItem(EVENTS, JSON.stringify(updated));
+    setEvents(updated);
+  }
+
+  const deleteEvents = () => {
+    if (window.confirm('Are you sure you want to delete all events?')) {
+      localStorage.removeItem(EVENTS);
+      setEvents([]);
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div>
+        <h1>Event log</h1>
+      </div>
+      <div onClick={updateEvent} style={{textAlign: "center"}}>
+        <button>Record Event</button>
+      </div>
+      <div>
+        <ul>
+          {events.map((event: Event) => (<li>{new Date(event.date).toString()}</li>))}
+        </ul>
+      </div>
+      <div onClick={deleteEvents} style={{textAlign: "center"}}>
+        <button>Delete All Events</button>
+      </div>
     </div>
   );
 }
