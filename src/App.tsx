@@ -1,7 +1,11 @@
 import React, {useState} from 'react';
+import dayjs from 'dayjs';
+import RelativeTime from 'dayjs/plugin/relativeTime';
 import './App.css';
 
 const EVENTS = 'events';
+
+dayjs.extend(RelativeTime)
 
 type Event = {
   date: string;
@@ -11,7 +15,7 @@ function App() {
   const [events, setEvents] = useState(JSON.parse(localStorage.getItem(EVENTS) || '[]'))
 
   const updateEvent = () => {
-    const newEvent = {date: new Date().getTime()};
+    const newEvent = {date: dayjs().format()};
     const updated = [...events, newEvent];
     localStorage.setItem(EVENTS, JSON.stringify(updated));
     setEvents(updated);
@@ -34,7 +38,7 @@ function App() {
       </div>
       <div>
         <ul>
-          {events.map((event: Event) => (<li>{new Date(event.date).toString()}</li>))}
+          {events.map((event: Event) => (<li>{dayjs(event.date).fromNow()}</li>))}
         </ul>
       </div>
       <div onClick={deleteEvents} style={{textAlign: "center"}}>
