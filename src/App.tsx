@@ -51,7 +51,7 @@ function App() {
 
   return (
     <div>
-      <div>
+      <div style={{textAlign: "center"}}>
         <h1>Event log</h1>
       </div>
       <div onClick={updateEvent} style={{textAlign: "center"}}>
