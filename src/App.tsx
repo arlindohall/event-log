@@ -19,7 +19,7 @@ function useToggle(): [boolean, () => void] {
 
 function Event({date, absolute}: {date: string, absolute: boolean}) {
   return (<div>
-    {absolute ? dayjs(date).format('MMMM D, YYYY (h:m A)') : dayjs(date).fromNow()}
+    {absolute ? dayjs(date).format('MMMM D, YYYY (h:mm A)') : dayjs(date).fromNow()}
   </div>);
 }
 
