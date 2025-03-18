@@ -79,8 +79,10 @@ class Application {
     this.events = fields.events;
   }
 
-  eventsOnTopic() {
-    return this.events.filter((event) => event.topic === this.topic);
+  eventsToShow() {
+    if (this.topic === DEFAULT_TOPIC) return this.events;
+
+    return this.eventsOnTopic();
   }
 
   withTopic(topic: string) {
@@ -123,15 +125,16 @@ class Application {
   }
 
   deleteEvents() {
-    if (this.events.length > 5) {
+    const onTopicEvents = this.eventsOnTopic();
+    if (onTopicEvents.length > 5) {
       return new Application({
         ...this,
-        events: this.events.slice(0, 5),
+        events: [...this.eventsNotOnTopic(), ...onTopicEvents.slice(0, 5)],
       });
     } else {
       return new Application({
         ...this,
-        events: [],
+        events: this.eventsNotOnTopic(),
       });
     }
   }
@@ -143,6 +146,14 @@ class Application {
       events: this.events.map((event) => event.toJson()),
       absoluteDate: this.absoluteDate,
     });
+  }
+
+  private eventsOnTopic() {
+    return this.events.filter((event) => event.topic === this.topic);
+  }
+
+  private eventsNotOnTopic() {
+    return this.events.filter((event) => event.topic !== this.topic);
   }
 }
 
@@ -206,7 +217,7 @@ function useApplication() {
     clearApplication,
     clearHistory,
     absoluteDate: application.absoluteDate,
-    events: application.eventsOnTopic(),
+    events: application.eventsToShow(),
     topic: application.topic,
     topics: application.topics,
   };
