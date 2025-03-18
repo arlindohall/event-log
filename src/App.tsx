@@ -223,12 +223,23 @@ function useApplication() {
   };
 }
 
-function Event({ date, absolute }: { date: string; absolute: boolean }) {
+function Event({
+  event,
+  topic,
+  absolute,
+}: {
+  event: EventRecord;
+  topic: string;
+  absolute: boolean;
+}) {
   return (
     <div>
       {absolute
-        ? dayjs(date).format("MMMM D, YYYY (h:mm A)")
-        : dayjs(date).fromNow()}
+        ? dayjs(event.date).format("MMMM D, YYYY (h:mm A)")
+        : dayjs(event.date).fromNow()}
+      {topic === DEFAULT_TOPIC ? (
+        <span className="padding-text">{event.topic}</span>
+      ) : null}
     </div>
   );
 }
@@ -258,6 +269,7 @@ function App() {
           events={events}
           absoluteDate={absoluteDate}
           toggleAbsoluteDate={toggleAbsoluteDate}
+          topic={topic}
         />
         <ClearHistory
           clearHistory={clearHistory}
@@ -297,10 +309,12 @@ function RecordEventHeader({
 function EventList({
   events,
   absoluteDate,
+  topic,
   toggleAbsoluteDate,
 }: {
   events: EventRecord[];
   absoluteDate: boolean;
+  topic: string;
   toggleAbsoluteDate: () => void;
 }) {
   return (
@@ -308,7 +322,7 @@ function EventList({
       <ul>
         {events.map((event: EventRecord) => (
           <li key={event.id()}>
-            <Event date={event.date} absolute={absoluteDate} />
+            <Event event={event} absolute={absoluteDate} topic={topic} />
           </li>
         ))}
       </ul>
