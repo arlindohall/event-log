@@ -50,6 +50,16 @@
   padding-right: 10px;
 }
 
+.padding-vertical-button {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.button-section {
+  max-width: 500px;
+  margin: auto;
+}
+
 .padding-section {
   padding-top: 30px;
 }

@@ -372,14 +372,12 @@ function Topics({
       <label htmlFor="TopicList">
         <h2>Topics</h2>
       </label>
-      <div className="padding-section">
-        <TopicsDropdown
-          topic={topic}
-          topics={topics}
-          setTopic={setTopic}
-          deleteTopic={deleteTopic}
-        />
-      </div>
+      <TopicsDropdown
+        topic={topic}
+        topics={topics}
+        setTopic={setTopic}
+        deleteTopic={deleteTopic}
+      />
       <div className="padding-section">
         <TopicInput addTopic={addTopic} />
       </div>
@@ -398,28 +396,32 @@ function TopicsDropdown({
   setTopic: (name: string) => void;
   deleteTopic: () => void;
 }) {
-  const onChange = (event: any) => setTopic(event.target.value);
-  const selectedTopicId = "topic-" + topic.toLowerCase();
-  const topicsWithId = topics.map((name) => [
-    name,
-    "topic-" + name.toLowerCase(),
-  ]);
+  const topicsWithId = topics
+    .filter((name) => name !== DEFAULT_TOPIC)
+    .map((name) => [name, "topic-" + name.toLowerCase()]);
 
-  debug({ topic, selectedTopicId });
+  debug({ topic });
 
   return (
     <>
       <h3>Selection</h3>
-      <span className="padding-button">
-        <select onChange={onChange} name="TopicList" id="TopicList">
-          {topicsWithId.map(([name, id]) => (
-            <option key={id} id={id} selected={id === selectedTopicId}>
-              {name}
-            </option>
-          ))}
-        </select>
-      </span>
-      <h3>Deletion</h3>
+      <div
+        className="padding-vertical-button"
+        onClick={() => setTopic(DEFAULT_TOPIC)}
+      >
+        <button>{DEFAULT_TOPIC}</button>
+      </div>
+      <div className="button-section">
+        {topicsWithId.map(([name, id]) => (
+          <span
+            onClick={() => setTopic(name)}
+            className="padding-vertical-button padding-button"
+          >
+            <button>{name}</button>
+          </span>
+        ))}
+      </div>
+      <h3>Create and delete topics</h3>
       <span className="padding-button">
         <button onClick={deleteTopic}>Delete Current Topic</button>
       </span>
