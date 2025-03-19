@@ -267,6 +267,7 @@ function App() {
         <RecordEventHeader topic={topic} addEvent={addEvent} />
       </section>
       <section>
+        <h3 className="center-heading">Event list</h3>
         <EventList
           events={events}
           absoluteDate={absoluteDate}
@@ -301,6 +302,7 @@ function RecordEventHeader({
   return (
     <>
       <h1>Event log: ({topic})</h1>
+      <h3>New event</h3>
       <div onClick={addEvent} className="center-button">
         <button>Record Event</button>
       </div>
@@ -341,6 +343,7 @@ function ClearHistory({
 }) {
   return (
     <div className="center-button">
+      <h3>Deletion</h3>
       <span onClick={clearHistory} className="padding-button">
         <button>Delete Events</button>
       </span>
@@ -406,6 +409,7 @@ function TopicsDropdown({
 
   return (
     <>
+      <h3>Selection</h3>
       <span className="padding-button">
         <select onChange={onChange} name="TopicList" id="TopicList">
           {topicsWithId.map(([name, id]) => (
@@ -415,6 +419,7 @@ function TopicsDropdown({
           ))}
         </select>
       </span>
+      <h3>Deletion</h3>
       <span className="padding-button">
         <button onClick={deleteTopic}>Delete Current Topic</button>
       </span>
