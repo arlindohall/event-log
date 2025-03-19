@@ -129,7 +129,9 @@ class Application {
     if (onTopicEvents.length > 5) {
       return new Application({
         ...this,
-        events: [...this.eventsNotOnTopic(), ...onTopicEvents.slice(0, 5)],
+        events: [...this.eventsNotOnTopic(), ...onTopicEvents.slice(0, 5)].sort(
+          (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
+        ),
       });
     } else {
       return new Application({
