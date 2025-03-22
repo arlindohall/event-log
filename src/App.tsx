@@ -216,27 +216,6 @@ function useApplication() {
   };
 }
 
-function Event({
-  event,
-  topic,
-  absolute,
-}: {
-  event: EventRecord;
-  topic: string;
-  absolute: boolean;
-}) {
-  return (
-    <div>
-      {absolute
-        ? dayjs(event.date).format("MMMM D, YYYY (h:mm A)")
-        : dayjs(event.date).fromNow()}
-      {topic === DEFAULT_TOPIC ? (
-        <span className="padding-text">{event.topic}</span>
-      ) : null}
-    </div>
-  );
-}
-
 function App() {
   const {
     setTopic,
@@ -253,147 +232,11 @@ function App() {
     backupJson,
   } = useApplication();
 
-  return (
-    <div>
-      <section className="center-heading">
-        <RecordEventHeader topic={topic} addEvent={addEvent} />
-      </section>
-      <section>
-        <h3 className="center-heading">Event list</h3>
-        <EventList
-          events={events}
-          absoluteDate={absoluteDate}
-          toggleAbsoluteDate={toggleAbsoluteDate}
-          topic={topic}
-        />
-        <ClearHistory
-          clearHistory={clearHistory}
-          clearApplication={clearApplication}
-        />
-      </section>
-      <section className="center-heading">
-        <Topics
-          topic={topic}
-          setTopic={setTopic}
-          addTopic={addTopic}
-          topics={topics}
-          deleteTopic={deleteTopic}
-        />
-      </section>
-      <section className="center-heading padding-last">
-        <h3>Download</h3>
-        <a download="backup.json" href={`data:application/json,${backupJson}`}>
-          <button>Download</button>
-        </a>
-      </section>
-    </div>
-  );
-}
+  // TOPICS
+  const [text, setText] = useState("My Topic");
 
-function RecordEventHeader({
-  topic,
-  addEvent,
-}: {
-  topic: string;
-  addEvent: () => void;
-}) {
-  return (
-    <>
-      <h1>Event log: ({topic})</h1>
-      <h3>New event</h3>
-      <div onClick={addEvent} className="center-button">
-        <button>Record Event</button>
-      </div>
-    </>
-  );
-}
-
-function EventList({
-  events,
-  absoluteDate,
-  topic,
-  toggleAbsoluteDate,
-}: {
-  events: EventRecord[];
-  absoluteDate: boolean;
-  topic: string;
-  toggleAbsoluteDate: () => void;
-}) {
-  return (
-    <div onClick={toggleAbsoluteDate}>
-      <ul>
-        {events.map((event: EventRecord) => (
-          <li key={event.id()}>
-            <Event event={event} absolute={absoluteDate} topic={topic} />
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function ClearHistory({
-  clearHistory,
-  clearApplication,
-}: {
-  clearHistory: () => void;
-  clearApplication: () => void;
-}) {
-  return (
-    <div className="center-button">
-      <h3>Deletion</h3>
-      <span onClick={clearHistory} className="padding-button">
-        <button>Delete Events</button>
-      </span>
-      <span onClick={clearApplication} className="padding-button">
-        <button>Clear All History And Topics</button>
-      </span>
-    </div>
-  );
-}
-
-function Topics({
-  topic,
-  topics,
-  addTopic,
-  setTopic,
-  deleteTopic,
-}: {
-  topic: string;
-  topics: string[];
-  addTopic: (topic: string) => void;
-  setTopic: (topic: string) => void;
-  deleteTopic: () => void;
-}) {
-  return (
-    <>
-      <label htmlFor="TopicList">
-        <h2>Topics</h2>
-      </label>
-      <TopicsDropdown
-        topic={topic}
-        topics={topics}
-        setTopic={setTopic}
-        deleteTopic={deleteTopic}
-      />
-      <div className="padding-section">
-        <TopicInput addTopic={addTopic} />
-      </div>
-    </>
-  );
-}
-
-function TopicsDropdown({
-  topic,
-  topics,
-  setTopic,
-  deleteTopic,
-}: {
-  topic: string;
-  topics: string[];
-  setTopic: (name: string) => void;
-  deleteTopic: () => void;
-}) {
+  const onText = (event: any) => setText(event.target.value.trim());
+  const onClick = () => addTopic(text);
   const topicsWithId = topics
     .filter((name) => name !== DEFAULT_TOPIC)
     .map((name) => [name, "topic-" + name.toLowerCase()]);
@@ -401,60 +244,112 @@ function TopicsDropdown({
   debug({ topic });
 
   return (
-    <>
-      <h3>Selection</h3>
-      <div
-        className="padding-vertical-button"
-        onClick={() => setTopic(DEFAULT_TOPIC)}
-      >
-        <button>{DEFAULT_TOPIC}</button>
-      </div>
-      <div className="button-section">
-        {topicsWithId.map(([name, id]) => (
-          <span
-            onClick={() => setTopic(name)}
-            className="padding-vertical-button padding-button"
-          >
-            <button>{name}</button>
+    <div className="page">
+      <header>
+        <h1>Event log</h1>
+      </header>
+      <main className="content">
+        <section className="segment body">
+          <h2>{topic}</h2>
+          <h3>New event</h3>
+          <div onClick={addEvent}>
+            <button>Record Event</button>
+          </div>
+          <h3>Event list</h3>
+          <div onClick={toggleAbsoluteDate}>
+            <ul>
+              {events.map((event: EventRecord) => (
+                <li key={event.id()}>
+                  {absoluteDate
+                    ? dayjs(event.date).format("MMMM D, YYYY (h:mm A)")
+                    : dayjs(event.date).fromNow()}
+                  {topic === DEFAULT_TOPIC ? (
+                    <span className="padding-left-1">{event.topic}</span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3>
+              Delete events
+              <span className="padding-left-1">
+                <img
+                  src="https://unpkg.com/@primer/octicons@13.0.0/build/svg/question-16.svg"
+                  alt="Help icon"
+                  title="Clicking 'Delete Events' deletes all events if there are 5 or fewer, otherwise it deletes all but the 5 latest events"
+                />
+              </span>
+            </h3>
+            <div onClick={clearHistory}>
+              <button>Delete Events</button>
+            </div>
+            <h3>
+              Delete all history
+              <span className="padding-left-1">
+                <img
+                  src="https://unpkg.com/@primer/octicons@13.0.0/build/svg/question-16.svg"
+                  alt="Help icon"
+                  title="Clicking 'Clear History' deletes all events and topics"
+                />
+              </span>
+            </h3>
+            <div onClick={clearApplication}>
+              <button>Clear History</button>
+            </div>
+          </div>
+        </section>
+        <section className="segment sidebar">
+          <label htmlFor="TopicList">
+            <h2>Topics</h2>
+          </label>
+          <h3>Selection</h3>
+          <div onClick={() => setTopic(DEFAULT_TOPIC)}>
+            <button>{DEFAULT_TOPIC}</button>
+          </div>
+          <div>
+            {topicsWithId.map(([name, id]) => (
+              <div onClick={() => setTopic(name)}>
+                <button>{name}</button>
+              </div>
+            ))}
+          </div>
+          <h3>Create topics</h3>
+          <div>
+            <span>
+              <label htmlFor="NewTopic">Add a new topic:</label>
+            </span>
+            <span>
+              <input
+                onChange={onText}
+                type="text"
+                id="NewTopic"
+                name="NewTopic"
+                required
+                minLength={2}
+                maxLength={32}
+                size={32}
+                placeholder="My Topic"
+              ></input>
+            </span>
+            <span>
+              <button onClick={onClick}>Submit</button>
+            </span>
+          </div>
+          <h3>Delete current topic</h3>
+          <span>
+            <button onClick={deleteTopic}>Delete</button>
           </span>
-        ))}
-      </div>
-      <h3>Create and delete topics</h3>
-      <span className="padding-button">
-        <button onClick={deleteTopic}>Delete Current Topic</button>
-      </span>
-    </>
-  );
-}
-
-function TopicInput({ addTopic }: { addTopic: (name: string) => void }) {
-  const [text, setText] = useState("My Topic");
-
-  const onText = (event: any) => setText(event.target.value.trim());
-  const onClick = () => addTopic(text);
-
-  return (
-    <>
-      <span className="padding-button">
-        <label htmlFor="NewTopic">Add a new topic:</label>
-      </span>
-      <span className="padding-button">
-        <input
-          onChange={onText}
-          type="text"
-          id="NewTopic"
-          name="NewTopic"
-          required
-          minLength={2}
-          maxLength={32}
-          size={32}
-          placeholder="My Topic"
-        ></input>
-      </span>
-      <span className="padding-button">
-        <button onClick={onClick}>Submit</button>
-      </span>
-    </>
+          <h3>Download</h3>
+          <a
+            download="backup.json"
+            href={`data:application/json,${backupJson}`}
+          >
+            <button>Download</button>
+          </a>
+        </section>
+      </main>
+    </div>
   );
 }
 
