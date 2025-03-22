@@ -64,6 +64,10 @@
   padding-top: 30px;
 }
 
+.padding-last {
+  padding-bottom: 30px;
+}
+
 .padding-text {
   padding-left: 10px;
 }

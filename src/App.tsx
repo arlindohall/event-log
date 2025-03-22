@@ -28,16 +28,6 @@ type ApplicationFields = {
 };
 
 class EventRecord {
-  static for({ events }: { events: string[] }): EventRecord[];
-  static for({ event }: { event: string }): EventRecord;
-  static for({ events, event }: { events?: string[]; event?: string }) {
-    if (event) return new EventRecord(JSON.parse(event));
-    if (events)
-      return events.map((event: string) => EventRecord.for({ event }));
-
-    throw new Error("Invalid input to Event Record");
-  }
-
   date: string;
   topic: string;
 
@@ -49,19 +39,12 @@ class EventRecord {
   id() {
     return `${this.topic ?? "default"}--${this.date}`;
   }
-
-  toJson() {
-    return JSON.stringify({
-      date: this.date,
-      topic: this.topic,
-    });
-  }
 }
 
 class Application {
   static for(string: string): Application {
     const fields = JSON.parse(string);
-    fields.events = EventRecord.for({ events: fields.events });
+    fields.events = fields.events.map((event: any) => new EventRecord(event));
 
     debug({ eventsInAppFor: fields.events });
     return new Application(fields);
@@ -145,7 +128,7 @@ class Application {
     return JSON.stringify({
       topic: this.topic,
       topics: this.topics,
-      events: this.events.map((event) => event.toJson()),
+      events: this.events as { date: string; topic: string }[],
       absoluteDate: this.absoluteDate,
     });
   }
@@ -175,11 +158,18 @@ const ensure = (action: () => void) => {
 
 function useApplication() {
   const [appState, setAppState] = useState(APPLICATION_AT_STARTUP);
-  const application = Application.for(appState);
+  let application: Application;
+  try {
+    application = Application.for(appState);
+  } catch (exception) {
+    console.error(exception);
+    application = DEFAULT_APP;
+  }
   debug({ application });
 
   const saveState = (app: Application) => {
     const string = app.toJson();
+    debug({ application });
     localStorage.setItem(APPLICATION, string);
     setAppState(string);
   };
@@ -222,6 +212,7 @@ function useApplication() {
     events: application.eventsToShow(),
     topic: application.topic,
     topics: application.topics,
+    backupJson: application.toJson(),
   };
 }
 
@@ -259,6 +250,7 @@ function App() {
     events,
     toggleAbsoluteDate,
     absoluteDate,
+    backupJson,
   } = useApplication();
 
   return (
@@ -287,6 +279,12 @@ function App() {
           topics={topics}
           deleteTopic={deleteTopic}
         />
+      </section>
+      <section className="center-heading padding-last">
+        <h3>Download</h3>
+        <a download="backup.json" href={`data:application/json,${backupJson}`}>
+          <button>Download</button>
+        </a>
       </section>
     </div>
   );
