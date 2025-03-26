@@ -332,7 +332,7 @@ function App() {
                 placeholder="My Topic"
               ></input>
             </span>
-            <span>
+            <span className="padding-left-1">
               <button onClick={onClick}>Submit</button>
             </span>
           </div>

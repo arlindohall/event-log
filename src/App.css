@@ -37,10 +37,15 @@
   }
 }
 
+header {
+  padding: 1em;
+}
+
 main.content {
   display: flex;
   flex-wrap: wrap;
-  justify-content: left;
+  gap: 1em;
+  padding: 1em;
 }
 
 main.content section.segment {
@@ -57,7 +62,6 @@ section.sidebar {
 }
 
 section.body {
-  min-width: 400px;
   flex: 100 20em;
 }
 
